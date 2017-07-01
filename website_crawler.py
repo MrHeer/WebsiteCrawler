@@ -1,14 +1,25 @@
-﻿from urllib import request
+﻿import socket
+from urllib import request
 import re
 import os
 
+import time
+
 target_url = 'http://www.heiyange.com'
-book_url = '/read/3586/'  # 修改此处可确定爬取哪一本小说
+book_url = '/read/7338/'  # 修改此处可确定爬取哪一本小说
 book_title = ''
 book_href = {}  # 序号-链接
 book_chapter = {}  # 序号-章节
+socket.setdefaulttimeout(10)
 
-data = request.urlopen(target_url + book_url).read().decode('gbk')
+while True:
+    try:
+        data = request.urlopen(target_url + book_url).read().decode('gbk')
+        break
+    except:
+        time.sleep(5)
+        print("正在尝试重连......")
+        pass
 
 book_title = re.search('<h3>(.+?)</h3>', data).group(1)
 target_string = re.findall('<li><a href="(.+?)<span></span></a></li>', data)
@@ -34,8 +45,15 @@ if not os.path.isdir(save_dir):
 for key in book_href.keys():
     if not os.path.isfile(save_dir + '/' + key + '.txt'):
         print("-----------------------------------------------")
-        print("开始爬取：" + book_chapter.get(key))
-        text = request.urlopen(book_href.get(key)).read().decode('gbk')
+        print("开始爬取：" + book_chapter.get(key) + "（" + key + ".txt）")
+        while True:
+            try:
+                text = request.urlopen(book_href.get(key)).read().decode('gbk')
+                break
+            except:
+                time.sleep(5)
+                print("正在尝试重连......")
+                pass
         content = re.findall('&nbsp;&nbsp;&nbsp;&nbsp;(.+?)<br />', text)
         print("正在爬取......")
         file = open(save_dir + '/' + key + '.txt', 'a')
@@ -49,7 +67,7 @@ for key in book_href.keys():
         print("爬取成功")
     else:
         print("-----------------------------------------------")
-        print("已经爬取：" + book_chapter.get(key))
+        print("已经爬取：" + book_chapter.get(key) + "（" + key + ".txt）")
 
 # 创建小说txt
 if not os.path.isfile(save_dir + '/' + book_title + '.txt'):
