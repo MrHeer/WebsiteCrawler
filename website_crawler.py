@@ -7,7 +7,6 @@ import time
 
 target_url = 'http://www.heiyange.com'
 book_url = '/read/4394/'  # 修改此处可确定爬取哪一本小说
-book_title = ''
 book_href = {}  # 序号-链接
 book_chapter = {}  # 序号-章节
 socket.setdefaulttimeout(10)
@@ -21,6 +20,7 @@ while True:
         print("正在尝试重连......")
         pass
 
+# 初始化操作
 book_title = re.search('<h3>(.+?)</h3>', data).group(1)
 target_string = re.findall('<li><a href="(.+?)<span></span></a></li>', data)
 print("正在爬取小说：" + book_title)
@@ -31,6 +31,7 @@ for string in target_string:
     book_href.update({str(i): href})
     book_chapter.update({str(i): chapter})
     i = i + 1
+book_len = len(book_href)
 
 # 创建存储目录
 save_dir = "./" + book_title
@@ -67,12 +68,12 @@ for key in book_href.keys():
         file.close()
         print("爬取成功")
         finish_count = finish_count + 1
-        print("已完成：" + str(int(finish_count / len(book_href) * 100)) + "%")
+        print("已完成：" + str(int(finish_count / book_len * 100)) + "%")
     else:
         print("-----------------------------------------------")
         print("已经爬取：" + book_chapter.get(key) + "（" + key + ".txt）")
         finish_count = finish_count + 1
-        print("已完成：" + str(int(finish_count / len(book_href) * 100)) + "%")
+        print("已完成：" + str(int(finish_count / book_len * 100)) + "%")
 
 # 创建小说txt
 if not os.path.isfile(save_dir + '/' + book_title + '.txt'):
@@ -81,7 +82,7 @@ if not os.path.isfile(save_dir + '/' + book_title + '.txt'):
     file = open(save_dir + '/' + book_title + '.txt', 'a')
     file_count = 0
     i = 1
-    while file_count < len(book_href):
+    while file_count < book_len:
         if os.path.isfile(save_dir + '/' + str(i) + '.txt'):
             read_file = open(save_dir + '/' + str(i) + '.txt')
             file.write(read_file.read())
