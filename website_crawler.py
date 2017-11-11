@@ -73,7 +73,7 @@ for key in book_href.keys():
         print("-----------------------------------------------")
         print("已经爬取：" + book_chapter.get(key) + "（" + key + ".txt）")
         finish_count = finish_count + 1
-        print("已完成：" + str(int(finish_count / book_len * 100)) + "%")
+        print("已完成：" + str(int(finish_count / book_len * 100)) + "%" + "  ("+ str(finish_count) + "/" + str(book_len) +")")
 
 # 创建小说txt
 if not os.path.isfile(save_dir + '/' + book_title + '.txt'):
